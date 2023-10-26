@@ -274,7 +274,7 @@ namespace FaceRec
                 file.Close();
                 isFileSaving = false;
             }
-            Thread.Sleep(500);
+            Thread.Sleep(700);
             processing = false;
         }
 
@@ -292,10 +292,17 @@ namespace FaceRec
                     Thread imageProcessingThread = new Thread(() => SaveFrameToFile(mat.ToMemoryStream()));
                     imageProcessingThread.Start();
                 }
-                //  Bitmap bitmap = MatToBitmap(mat);
+
                 if (!isFileSaving)
                 {
-                    mat = DetectFaces(faceRecognition, model, people, mat);
+                    try
+                    {
+                        mat = DetectFaces(faceRecognition, model, people, mat);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Exception in detection");
+                    }
                 }
                 Cv2.ImShow("Image Show", mat);
             }
@@ -355,9 +362,10 @@ namespace FaceRec
                 {
                     if (bestAvgDistance < 0.5)
                     {
+                        bestAvgMatchPerson.Precision = (1 - bestAvgDistance) * 100;
                         Console.WriteLine("Best match distance person: " +
                         bestAvgMatchPerson.Name +
-                        "\nWith average: " + ((1 - bestAvgDistance) * 100).ToString("0.000") +
+                        "\nWith average: " + bestAvgMatchPerson.Precision +
                         " %\nAnd minimal: " + ((1 - minDistance) * 100).ToString("0.000") +
                         " %\n--------------------------------------------------");
                     }
@@ -430,7 +438,7 @@ namespace FaceRec
                 new OpenCvSharp.Point(faceLocation.Right, faceLocation.Bottom + 20),
                 Scalar.Red,
                 -1);
-            mat.PutText(person.Name, new OpenCvSharp.Point(faceLocation.Left + 3, faceLocation.Bottom + 15), fontFace: HersheyFonts.HersheyDuplex, fontScale: 0.5, color: Scalar.White);
+            mat.PutText(string.Format("{0} - {1}%", person.Name, person.Precision.ToString("0.00")), new OpenCvSharp.Point(faceLocation.Left + 3, faceLocation.Bottom + 15), fontFace: HersheyFonts.HersheyDuplex, fontScale: 0.5, color: Scalar.White);
         }
     }
 }
