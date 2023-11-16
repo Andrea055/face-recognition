@@ -8,13 +8,12 @@
 <div class="popup-content">
     <h2>Add user</h2>
 
-    <input type="text" @bind="nome" placeholder="User name" />
-    <input type="text" @bind="surname" placeholder="User surname" />
+    <input type="text" @bind="nome" placeholder="Nome utente" />
 
     <div> @resp.msg </div>
 
     <br><br>
-    <button @onclick="add_user"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add user </div> </button>
+    <button @onclick="add_user"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add </div> </button>
     <button @onclick="close_pop"> <div> <face_recognition.Client.Pages.Icon name="close" /> Chiudi </div> </button>
 </div>
 
@@ -39,10 +38,9 @@
     private ApiResponse resp = new ApiResponse();
 
     private string? nome;
-    private string? surname;
 
     private async void add_user(){
-        var response = await Http.GetAsync("api/AddUser?token="+Variables.Token+"&name="+nome+"&surname="+surname);
+        var response = await Http.GetAsync("api/AddUser?token="+Variables.Token+"&name="+nome);
         string jsonContent = await response.Content.ReadAsStringAsync();
         resp = JsonSerializer.Deserialize<ApiResponse>(jsonContent);
         StateHasChanged();

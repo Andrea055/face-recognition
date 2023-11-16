@@ -6,11 +6,13 @@ public partial class FaceContext : DbContext
 {
     public FaceContext()
     {
+        Database.EnsureCreated();
     }
 
     public FaceContext(DbContextOptions<FaceContext> options)
         : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public virtual DbSet<Class> Classes { get; set; }
