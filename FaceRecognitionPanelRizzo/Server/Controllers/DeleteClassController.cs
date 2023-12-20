@@ -10,7 +10,7 @@ namespace face_recognition.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DeleteUserController : ControllerBase
+    public class DeleteClassController : ControllerBase
     {
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
@@ -18,14 +18,18 @@ namespace face_recognition.Server.Controllers
         public string Get([FromQuery] string token, [FromQuery] int id){
             var db = new FaceContext();
             if(token == Variables.Token){
-                Utenti utente = db.Utenti.FirstOrDefault(u => u.Id == id);
-                string path = "utenti/" + utente.Nome + "_" + utente.Cognome;
-                if(Directory.Exists(path)){
-                    Directory.Delete(path);
+                // Class classe = db.Classes.FirstOrDefault(u => u.ClassId == id);
+                // db.Classes.Remove(classe);
+                // db.SaveChanges();
+                // return "Class " + classe.ClassName + " deleted";
+
+                // rimuovi tutte le classi
+                var allClasses = db.Classi.ToList();
+                foreach(var classe in allClasses){
+                    db.Classi.Remove(classe);
                 }
-                db.Utenti.Remove(utente);
                 db.SaveChanges();
-                return "User " + utente.Nome + " deleted";
+                return "All classes deleted";
             }else{
                 return "Invalid API token";
             }

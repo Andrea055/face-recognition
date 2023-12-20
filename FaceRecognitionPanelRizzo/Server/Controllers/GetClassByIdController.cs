@@ -4,30 +4,34 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using face_recognition.Shared;
-using System.Security.Permissions;
 using DBContext;
 
 namespace face_recognition.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GetUsersController : ControllerBase
+    public class GetClassById : ControllerBase
     {
-        
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
         [HttpGet]
-        public List<Utenti> Get([FromQuery] string token){
+        public Classi Get([FromQuery] string token, [FromQuery] int id){
             var db = new FaceContext();
-            List<Utenti> vuota = new List<Utenti>();
             if (token == Variables.Token)
             {
-                Console.WriteLine("token ok");
-                List<Utenti> all_utenti = db.Utenti.ToList();
-                return all_utenti;
-            }else{
-                Console.WriteLine("token invalido");
-                return vuota;
+                Classi classe = db.Classi.FirstOrDefault(u => u.Id == id);
+                if (classe != null)
+                {
+                    return classe;
+                }
+                else
+                {
+                    return new Classi();
+                }
+            }
+            else
+            {
+                return new Classi();
             }
         }
     }

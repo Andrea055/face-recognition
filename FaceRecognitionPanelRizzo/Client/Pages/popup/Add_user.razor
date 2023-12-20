@@ -1,5 +1,7 @@
 @using face_recognition.Shared;
 @using System.Text.Json
+@using DBContext
+
 @inject HttpClient Http
 
 
@@ -8,14 +10,20 @@
 <div class="popup-content">
     <h2>Add user</h2>
 
-    <input type="text" @bind="nome" placeholder="User name" />
-    <input type="text" @bind="surname" placeholder="User surname" />
+    <input type="text" @bind="nome" placeholder="User name" /> <br>
+    <input type="text" @bind="surname" placeholder="User surname" /> <br>
+    <select @bind="classe">
+        <option value="">Nessuna</option>
+        @foreach(var cl in lista_classi){
+            <option value="@cl.Id">@cl.Sezione</option>
+        }
+    </select>
 
-    <div> @resp.msg </div>
+    <div class='info-utente'> @resp.msg </div>
 
     <br><br>
     <button @onclick="add_user"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add user </div> </button>
-    <button @onclick="close_pop"> <div> <face_recognition.Client.Pages.Icon name="close" /> Chiudi </div> </button>
+    <button @onclick="close_pop"> <div> <face_recognition.Client.Pages.Icon name="close" /> Close </div> </button>
 </div>
 
 </div>
@@ -37,16 +45,25 @@
     public EventCallback<MouseEventArgs> reload {get; set;}
 
     private ApiResponse resp = new ApiResponse();
+    private List<Classi> lista_classi = new List<Classi>(); 
 
+    private string? classe;
     private string? nome;
     private string? surname;
 
     private async void add_user(){
-        var response = await Http.GetAsync("api/AddUser?token="+Variables.Token+"&name="+nome+"&surname="+surname);
-        string jsonContent = await response.Content.ReadAsStringAsync();
-        resp = JsonSerializer.Deserialize<ApiResponse>(jsonContent);
+        if(classe!="" && nome!="" && surname!=""){
+            var response = await Http.GetAsync("api/AddUser?token="+Variables.Token+"&name="+nome+"&surname="+surname+"&classe="+classe);
+            string jsonContent = await response.Content.ReadAsStringAsync();
+            resp = JsonSerializer.Deserialize<ApiResponse>(jsonContent);
+            StateHasChanged();
+            await reload.InvokeAsync();
+        }
+    }
+
+    private async void import_classi(){
+        lista_classi = await Http.GetFromJsonAsync<List<Classi>>("api/GetClasses?token=" + Variables.Token);
         StateHasChanged();
-        await reload.InvokeAsync();
     }
 
     public class ApiResponse // class for api users requests
@@ -54,6 +71,11 @@
         public int? code { get; set; }
         public string[]? Details { get; set; }
         public string? msg { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync() // api get users
+    {
+        import_classi();
     }
 
 }

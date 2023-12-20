@@ -15,12 +15,12 @@ namespace face_recognition.Server.Controllers
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
         [HttpGet]
-        public User Get([FromQuery] string token, [FromQuery] int id){
+        public Utenti Get([FromQuery] string token, [FromQuery] int id){
             var db = new FaceContext();
             if (token == Variables.Token)
             {
                 // Assuming you want to retrieve a specific user by ID
-                User utente = db.Users.FirstOrDefault(u => u.Id == id);
+                Utenti utente = db.Utenti.FirstOrDefault(u => u.Id == id);
 
                 // Check if the user with the specified ID was found
                 if (utente != null)
@@ -30,13 +30,13 @@ namespace face_recognition.Server.Controllers
                 else
                 {
                     // If the user with the specified ID was not found, return an empty list
-                    return new User();
+                    return new Utenti();
                 }
             }
             else
             {
                 // If the token is not valid, return an empty list
-                return new User();
+                return new Utenti();
             }
         }
     }

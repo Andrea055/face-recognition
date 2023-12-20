@@ -1,18 +1,18 @@
-@page "/users_db"
+@page "/classes"
 
 @using face_recognition.Shared
 @using System.Text.Json
 @using DBContext
 @inject HttpClient Http
 
-<PageTitle>Users</PageTitle>
+<PageTitle>Classes</PageTitle>
 
-<h1>Users</h1>
+<h1>Classes</h1>
 
-<face_recognition.Client.Pages.popup.Add_user close_pop="@make_add_no_visible" reload="@reload" visible=@add_user_visible />
+<face_recognition.Client.Pages.popup.Add_class close_pop="@make_add_no_visible" reload="@reload" visible=@add_user_visible />
 
 <div class="box">
-    <button   @onclick="make_add_visible"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add user </div></button>
+    <button   @onclick="make_add_visible"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add class </div></button>
 </div>
 
 @if(api_response!=""){
@@ -22,36 +22,41 @@
 }
 
 <div class="box">
-    @if(utenti.Count!=0){
-        @foreach (var utente in utenti)
+    @if(lista_classi.Count!=0){
+        @foreach (var classe in lista_classi)
         {
-            <button @onclick="(() => select_user(utente.Id))" class='utente'> <div> <face_recognition.Client.Pages.Icon name="person" /> @utente.Name @utente.Surname </div> </button>
+            <button @onclick="(() => select_class( classe.Id ))" class='utente'> <div> <face_recognition.Client.Pages.Icon name="person" /> @classe.Sezione </div> </button>   
         }
     }
 </div>
 
-@if(utente.Name != null){
+@if(classe.Sezione != null){
     <div class="info-utente">
-        <b>Name: </b> @utente.Name <br>
-        <b>Surname: </b> @utente.Surname
-
-        <br><button @onclick="(() => delete_user( utente.Id ))"><div><face_recognition.Client.Pages.Icon name="Delete" /> Delete user</div> </button>
+        <b>Name: </b> @classe.Sezione 
+        <br><button @onclick="(() => delete_class( classe.Id ))"><div><face_recognition.Client.Pages.Icon name="Delete" /> Delete class</div> </button>
     </div>
 }
 
 @code {
-    private List<User> utenti = new List<User>();
-    private User utente = new User();
+    private List<Classi> lista_classi = new List<Classi>();
+    private Classi classe = new Classi();
+    private int? id_class_selected;
     private bool add_user_visible = false; // popup add user visible or not
     private string? api_response;
 
     private async void import(){
-        utenti = await Http.GetFromJsonAsync<List<User>>("api/GetUsers?token=" + Variables.Token);
+        lista_classi = await Http.GetFromJsonAsync<List<Classi>>("api/GetClasses?token=" + Variables.Token);
         StateHasChanged();
     }
 
-    private async void import_user_by_id(int id){
-        utente = await Http.GetFromJsonAsync<User>("api/GetUserBYId?token=" + Variables.Token+"&id="+id);
+    private async void import_class_by_id(int id){
+        if(id_class_selected==id) {
+            id_class_selected=-1;
+            classe = new Classi();
+        }else{
+            classe = await Http.GetFromJsonAsync<Classi>("api/GetClassById?token=" + Variables.Token+"&id="+id);
+            id_class_selected=id;
+        }
         StateHasChanged();
     }
 
@@ -69,20 +74,19 @@
         StateHasChanged();
     }
 
-    private async Task select_user(int utente){
-        import_user_by_id(utente);
+    private async Task select_class(int id_classe){
+        import_class_by_id(id_classe);
         StateHasChanged();
     }
 
-    private async Task delete_user(int id){
-        var response = await Http.GetAsync("api/DeleteUser?token="+Variables.Token+"&id="+id);
+    private async Task delete_class(int id){
+        var response = await Http.GetAsync("api/DeleteClass?token="+Variables.Token+"&id="+id);
+        classe = new Classi();
         import();
-        utente = new User();
         StateHasChanged();
     }
 
     private async Task reload(){
-        Console.WriteLine("ok reload");
         import();
         StateHasChanged();
     }

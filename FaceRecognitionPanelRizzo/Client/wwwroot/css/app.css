@@ -112,12 +112,16 @@ button:hover{
 }
 
 
-input{
+input, select{
     border: 2px solid white;
     outline-width: 0;
     border-radius: 7px;
     padding: 5px;
+    margin-bottom: 5px;
 }
-input:focus{
+input:focus, select{
     border: 2px solid blueviolet;
+}
+select:hover{
+    cursor: pointer;
 }
