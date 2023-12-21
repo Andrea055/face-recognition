@@ -1,2 +1,0 @@
-#start project 
-dotnet new blazorwasm -ho
