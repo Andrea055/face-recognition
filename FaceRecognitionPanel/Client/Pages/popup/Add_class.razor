@@ -1,0 +1,51 @@
+@using face_recognition.Shared;
+@using System.Text.Json
+@inject HttpClient Http
+
+<div class="popup @( visible ? "" : "hide")">
+    
+<div class="popup-content">
+    <h2>Add new class</h2>
+
+    <input type="text" @bind="nome_classe" placeholder="Class name" />
+
+    <div class='info-utente'> @text </div>
+
+    <br><br>
+    <button @onclick="add_class"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add class </div> </button>
+    <button @onclick="close_pop"> <div> <face_recognition.Client.Pages.Icon name="close" /> Close </div> </button>
+</div>
+
+</div>
+
+<style>
+    .popup-content button{
+        float: right;
+    }
+</style>
+
+@code{
+    [Parameter]
+    public bool visible {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> close_pop {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> reload {get; set;}
+
+    private string? nome_classe;
+    private string? text;
+
+    private async void add_class(){
+        var response = await Http.GetAsync("api/AddClass?token="+Variables.Token+"&name_class="+nome_classe);
+        text = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(text);
+        StateHasChanged();
+        await reload.InvokeAsync();
+    }
+
+}
+
+
+
