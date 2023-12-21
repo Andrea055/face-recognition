@@ -9,6 +9,7 @@ namespace FaceRec
 {
     public class Program
     {
+        public static Person Unknown {get; set;} = new Person("Unknown");
         public static int Main()
         {
             FaceRecognition? faceRecognition = FaceRecognition.Create(Path.GetFullPath("models"));
@@ -273,7 +274,7 @@ namespace FaceRec
                 file.Close();
                 isFileSaving = false;
             }
-            Thread.Sleep(500);
+            Thread.Sleep(700);
             processing = false;
         }
 
@@ -291,10 +292,17 @@ namespace FaceRec
                     Thread imageProcessingThread = new Thread(() => SaveFrameToFile(mat.ToMemoryStream()));
                     imageProcessingThread.Start();
                 }
-                //  Bitmap bitmap = MatToBitmap(mat);
+
                 if (!isFileSaving)
                 {
-                    mat = DetectFaces(faceRecognition, model, people, mat);
+                    try
+                    {
+                        mat = DetectFaces(faceRecognition, model, people, mat);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Exception in detection");
+                    }
                 }
                 Cv2.ImShow("Image Show", mat);
             }
@@ -352,22 +360,19 @@ namespace FaceRec
 
                 if (bestAvgMatchPerson != null && minDistancePerson != null)
                 {
-                    if (bestAvgMatchPerson.Equals(minDistancePerson))
+                    if (bestAvgDistance < 0.5)
                     {
+                        bestAvgMatchPerson.Precision = (1 - bestAvgDistance) * 100;
                         Console.WriteLine("Best match distance person: " +
                         bestAvgMatchPerson.Name +
-                        "\nWith average: " + bestAvgDistance +
-                        "\nAnd minimal: " + minDistance +
-                        "\n--------------------------------------------------");
+                        "\nWith average: " + bestAvgMatchPerson.Precision +
+                        " %\nAnd minimal: " + ((1 - minDistance) * 100).ToString("0.000") +
+                        " %\n--------------------------------------------------");
                     }
                     else
                     {
-                        Console.WriteLine("Best average distance match person: " +
-                        bestAvgMatchPerson.Name +
-                        "\nWith average: " + bestAvgDistance +
-                        "\nAnd best minimal distance match person: " +
-                        minDistancePerson.Name +
-                        "\n--------------------------------------------------");
+                        bestAvgMatchPerson = Unknown;
+                        Console.WriteLine("Best average distance match person: Unknown\n--------------------------------------------------");
                     }
                 }
 
@@ -433,7 +438,7 @@ namespace FaceRec
                 new OpenCvSharp.Point(faceLocation.Right, faceLocation.Bottom + 20),
                 Scalar.Red,
                 -1);
-            mat.PutText(person.Name, new OpenCvSharp.Point(faceLocation.Left + 3, faceLocation.Bottom + 15), fontFace: HersheyFonts.HersheyDuplex, fontScale: 0.5, color: Scalar.White);
+            mat.PutText(string.Format("{0} - {1}%", person.Name, person.Precision.ToString("0.00")), new OpenCvSharp.Point(faceLocation.Left + 3, faceLocation.Bottom + 15), fontFace: HersheyFonts.HersheyDuplex, fontScale: 0.5, color: Scalar.White);
         }
     }
 }
