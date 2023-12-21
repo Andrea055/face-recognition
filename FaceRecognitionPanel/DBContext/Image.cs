@@ -6,5 +6,5 @@ public class Image
 
     public string? ImagePath { get; set; }
 
-    public User FkUser {get; set;} = new();
+    public Utenti FkUser {get; set;} = new();
 }

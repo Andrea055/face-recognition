@@ -29,7 +29,7 @@ namespace face_recognition.Server.Controllers
                         if(!Directory.Exists(path+dir)){
                             Directory.CreateDirectory(path+dir);
                         }
-                        db.Add(new Utenti{ Nome=name, Cognome=surname, Id_classe=classe});
+                        db.Add(new Utenti{ Nome=name, Cognome=surname, ClassiId=classe});
                         db.SaveChanges(); /* problema erore non trova tabella Classes */
                         errors.TryGetValue(code, out Output);
                         return new JsonResult( new { Code = code, msg = Output/* , utenti = Utenti.Users_db */ } );

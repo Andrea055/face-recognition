@@ -61,7 +61,7 @@
         }else{
             utente = await Http.GetFromJsonAsync<Utenti>("api/GetUserById?token=" + Variables.Token+"&id="+id);
             id_user_selected=id;
-            import_class_by_id(utente.Id_classe);
+            import_class_by_id(utente.ClassiId);
         }
         StateHasChanged();
     }

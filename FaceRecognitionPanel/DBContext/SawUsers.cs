@@ -4,7 +4,7 @@ public partial class SawUsers
 {
     public int Id { get; set; }
     
-    public User User { get; set; } = null!;
+    public Utenti User { get; set; } = null!;
     
     public bool Seen { get; set; }
     
