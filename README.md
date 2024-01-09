@@ -38,7 +38,7 @@ Required things:
  - MySQL
  - DotNet 6
 
-**Optional** : edit in ```FaceRecognitionPanel/DBContext/Model.cs``` username and password. 
+**IMPORTANT** : create a user in database for the project and insert the userID and password in ```FaceRecognitionPanel/DBContext/Model.cs```. 
 
 Create the database's scaffholding 
 ```bash
