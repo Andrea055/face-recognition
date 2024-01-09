@@ -1,0 +1,132 @@
+@page "/classes"
+
+@using face_recognition.Shared
+@using System.Text.Json
+@using DBContext
+@inject HttpClient Http
+
+<PageTitle>Classes</PageTitle>
+
+<h1>Classes</h1>
+
+<face_recognition.Client.Pages.popup.Add_class close_pop="@make_add_no_visible" reload="@reload" visible=@add_user_visible />
+
+<div class="box">
+    <button   @onclick="make_add_visible"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add class </div></button>
+</div>
+
+@if(api_response!=""){
+    <div>
+        @api_response
+    </div>
+}
+
+<div class="box">
+    @if(lista_classi.Count!=0){
+        @foreach (var classe in lista_classi)
+        {
+            <button @onclick="(() => select_class( classe.Id ))" class='utente'> <div> <face_recognition.Client.Pages.Icon name="person" /> @classe.Sezione </div> </button>   
+        }
+    }
+</div>
+
+@if(classe.Sezione != null){
+    <div class="info-utente">
+        <b>Name: </b> @classe.Sezione 
+        <br><button @onclick="(() => delete_class( classe.Id ))"><div><face_recognition.Client.Pages.Icon name="Delete" /> Delete class</div> </button>
+    </div>
+}
+
+@code {
+    private List<Classi> lista_classi = new List<Classi>();
+    private Classi classe = new Classi();
+    private int? id_class_selected;
+    private bool add_user_visible = false; // popup add user visible or not
+    private string? api_response;
+
+    private async void import(){
+        lista_classi = await Http.GetFromJsonAsync<List<Classi>>("api/GetClasses?token=" + Variables.Token);
+        StateHasChanged();
+    }
+
+    private async void import_class_by_id(int id){
+        if(id_class_selected==id) {
+            id_class_selected=-1;
+            classe = new Classi();
+        }else{
+            classe = await Http.GetFromJsonAsync<Classi>("api/GetClassById?token=" + Variables.Token+"&id="+id);
+            id_class_selected=id;
+        }
+        StateHasChanged();
+    }
+
+    private async Task make_add_visible()
+    {
+        add_user_visible = true;
+        import();
+        StateHasChanged();
+    }
+
+    private async Task make_add_no_visible()
+    {
+        add_user_visible = false;
+        import();
+        StateHasChanged();
+    }
+
+    private async Task select_class(int id_classe){
+        import_class_by_id(id_classe);
+        StateHasChanged();
+    }
+
+    private async Task delete_class(int id){
+        var response = await Http.GetAsync("api/DeleteClass?token="+Variables.Token+"&id="+id);
+        classe = new Classi();
+        import();
+        StateHasChanged();
+    }
+
+    private async Task reload(){
+        import();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync() // api get users
+    {
+        import();
+    }
+}
+
+
+
+<style>
+    .utente{
+        transition: 0.5s;
+        padding: 15px;
+        padding-bottom: 2px;
+        padding-top: 5px;
+        border: 1px solid white;
+        border-bottom: 3px solid white;
+        display: inline-block;
+        border-radius: 10px;
+        margin-right: 10px;
+    }
+    .utente:hover{
+        border: 1px solid blueviolet;
+        border-bottom: 3px solid blueviolet;
+        background-color: rgba(137, 43, 226, 0.159);
+        cursor: pointer;
+    }
+
+    .utente > div, button > div{
+        display: flex;
+        align-items: center;
+    }
+    .info-utente{
+        margin-left: 20px;
+        margin-top: 20px;
+    }
+    .info-utente button{
+        margin-left: 0;
+    }
+</style>
