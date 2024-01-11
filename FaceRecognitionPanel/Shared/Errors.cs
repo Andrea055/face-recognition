@@ -6,6 +6,7 @@ public class MyErrors{
         { 210, "User added"},
         { 211, "User already exist"},
         { 212, "Invalid name"},
+        { 213, "Images saved" },
 
         { 403, "Permission denied"},
         { 404, "Page doesn't found" }

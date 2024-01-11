@@ -1,0 +1,129 @@
+@using face_recognition.Shared;
+@using System.Text.Json
+@using DBContext
+@using Microsoft.AspNetCore.Hosting
+@using System.Linq
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@using System 
+@using System.IO
+
+@inject HttpClient Http
+
+<div class="popup @( visible ? "" : "hide")">
+    
+<div class="popup-content">
+    <h2>All user images </h2>
+    <b>User:</b> @nome_utente @cognome_utente
+
+    <br>
+
+    @foreach(file f in files){
+        @f.nome_file <br>
+    }
+
+    <div class='info-utente'> <div class="center"> @resp.msg </div> </div>
+
+    <br>
+    <button @onclick="close_pop"> <div> <face_recognition.Client.Pages.Icon name="close" /> Close </div> </button>
+</div>
+
+</div>
+
+<style>
+    .popup-content button{
+        float: right;
+    }
+    .center{
+        text-align: center;
+    }
+</style>
+
+@code{
+    [Parameter]
+    public bool visible {get; set;}
+
+    [Parameter]
+    public List<file>? files {get; set;}
+
+    [Parameter]
+    public string? nome_utente {get; set;}
+    [Parameter]
+    public string? cognome_utente {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> close_pop {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> reload {get; set;}
+
+    private ApiResponse resp = new ApiResponse();
+    public class ApiResponse // class for api users requests
+    {
+        public int? code { get; set; }
+        public string[]? Details { get; set; }
+        public string? msg { get; set; }
+    }
+}
+
+<style>
+
+div.custom_file_upload {
+    height: 20px;
+}
+
+input.file {
+    width: 150px;
+    height: 20px;
+    border: 1px solid #BBB;
+    border-right: 0;
+    color: #888;
+    padding: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+div.file_upload {
+    height: 37px;
+    background: #b47aff;
+    background: -moz-linear-gradient(top, #d0adff 0%, #c091ff 44%, rgb(174, 112, 255) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(174, 112, 255)), color-stop(44%,#b47aff), color-stop(100%,#b47aff));
+    background: -webkit-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: -o-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: -ms-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b47aff', endColorstr='#b47aff',GradientType=0 ); */
+    cursor: pointer;
+    border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    font-weight: bold;
+    color: #FFF;
+    text-align: center;
+    padding-top: 8px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin: auto;
+    max-width: 200px;
+    
+}
+div.file_upload:before {
+    content: 'SELECT IMAGES';
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+div.file_upload input {
+    position: relative;
+    height: 40px;
+    width: 200px;
+    margin-top: -20px;
+    display: inline;
+    opacity: 0;
+}
+input[type=file]:hover, .file_upload:hover{
+    cursor: pointer;
+}
+</style>
