@@ -36,7 +36,6 @@ namespace face_recognition.Server.Controllers
                     foreach(string image in immagini){
                         arr = image.Split("/");
                         var str = System.IO.File.ReadAllBytes(image);
-                        Console.WriteLine(str);
                         images[i].files.Add( new file_data { nome_file=arr[arr.Count()-1], content=str } );
                     }
                     i++;
