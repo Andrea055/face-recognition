@@ -100,8 +100,8 @@
             resp.msg = "Uploading images...";
             List<immagine> images = new(); 
             foreach(IBrowserFile image in immagini){
-                using(var ms = new MemoryStream()) {
-                    await image.OpenReadStream().CopyToAsync(ms);
+                using(var ms = new MemoryStream()) {byte[] buffer = new byte[1024 * 1024 * 30];
+                    await image.OpenReadStream(maxAllowedSize: 1024 * 1024 * 30).CopyToAsync(ms);
                     byte[] base64 = ms.ToArray();
                     images.Add( new immagine { content=base64, name=image.Name, user=nome_utente+"_"+cognome_utente } );
                 }
@@ -110,6 +110,8 @@
             richiesta.dataimages = images;
             richiesta.token = Variables.Token;
             var response = await Http.PostAsJsonAsync("api/AddImage", richiesta);
+            resp.msg="Images uploaded";
+            Console.WriteLine("Images uploaded");
         }else{
             resp.msg = "No one image uploaded";
         }
