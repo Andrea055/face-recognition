@@ -26,7 +26,7 @@ namespace face_recognition.Server.Controllers
                 string[] images = Directory.GetFiles(folderPath, "*.jpg");
                 foreach(string image in images){
                     string[] arr = image.Split("/");
-                    
+                    var str = System.IO.File.ReadAllBytes(image);
                     files.Add( new file { nome_file=arr[arr.Count()-1] });
                 }
             }else{

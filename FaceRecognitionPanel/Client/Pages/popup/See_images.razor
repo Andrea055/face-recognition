@@ -21,8 +21,10 @@
 
     <b>Images uploaded: </b><br>
 
-    @foreach(file f in files){
-        @f.nome_file <br>
+    @foreach(var f in files.Select((img, index) => (img, index))){
+        @f.index
+        <span>) </span> 
+        @f.img.nome_file <br>
     }
 
     <div class='info-utente'> <div class="center"> @resp.msg </div> </div>
