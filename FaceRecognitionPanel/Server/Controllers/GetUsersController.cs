@@ -22,7 +22,6 @@ namespace face_recognition.Server.Controllers
             List<Utenti> vuota = new List<Utenti>();
             if (token == Variables.Token)
             {
-                Console.WriteLine("token ok");
                 List<Utenti> all_utenti = db.Utenti.ToList();
                 return all_utenti;
             }else{

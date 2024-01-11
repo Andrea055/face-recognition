@@ -1,0 +1,187 @@
+@using face_recognition.Shared;
+@using System.Text.Json
+@using DBContext
+@using Microsoft.AspNetCore.Hosting
+@using System.Linq
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@* @inject IHttpClientFactory ClientFactory *@
+@* @inject ILogger<FileUpload1> Logger *@
+@* @inject IWebHostEnvironment Environment *@
+@using System 
+@using System.IO
+
+@inject HttpClient Http
+
+<div class="popup @( visible ? "" : "hide")">
+    
+<div class="popup-content">
+    <h2>Add user images </h2>
+    <b>User:</b> @nome_utente @cognome_utente
+
+    <br><br>
+    <div class="custom_file_upload">
+        <div class="file_upload">
+            <InputFile OnChange="@LoadFiles" multiple />      
+        </div>
+    </div>
+    <br>
+
+    <div>
+        @if(immagini.Count!=0){
+            @foreach (var image in immagini)
+            {
+                @image.Name <br>;
+            }
+        }
+    </div>
+
+    <div class='info-utente'> <div class="center"> @resp.msg </div> </div>
+
+    <br>
+    <button @onclick="add_images"> <div> <face_recognition.Client.Pages.Icon name="add" /> Add images </div> </button>
+    <button @onclick="close_popup"> <div> <face_recognition.Client.Pages.Icon name="close" /> Close </div> </button>
+</div>
+
+</div>
+
+<style>
+    .popup-content button{
+        float: right;
+    }
+    .center{
+        text-align: center;
+    }
+</style>
+
+@code{
+    [Parameter]
+    public bool visible {get; set;}
+
+    [Parameter]
+    public string? nome_utente {get; set;}
+    [Parameter]
+    public string? cognome_utente {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> close_pop {get; set;}
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> reload {get; set;}
+
+    public List<IBrowserFile> immagini = new List<IBrowserFile>();
+    private List<IBrowserFile> loadedFiles = new();
+    private long maxFileSize = 1024 * 15;
+    private int maxAllowedFiles = 10;
+    private bool isLoading;
+
+    private ApiResponse resp = new ApiResponse();
+
+    public async void close_popup(MouseEventArgs e){
+        await close_pop.InvokeAsync(e);
+        immagini = new List<IBrowserFile>();
+        resp.msg = "";
+    }
+
+    private async void LoadFiles(InputFileChangeEventArgs e)
+    {
+        immagini.Clear();
+        foreach (IBrowserFile file in e.GetMultipleFiles(@* maxAllowedFiles *@))
+        {
+            immagini.Add(file);
+        }
+    }
+    
+
+    private async void add_images(){
+        Console.WriteLine("adding images...");
+        if(immagini.Count!=0){
+            resp.msg = "Uploading images...";
+            List<immagine> images = new(); 
+            foreach(IBrowserFile image in immagini){
+                using(var ms = new MemoryStream()) {byte[] buffer = new byte[1024 * 1024 * 30];
+                    await image.OpenReadStream(maxAllowedSize: 1024 * 1024 * 30).CopyToAsync(ms);
+                    byte[] base64 = ms.ToArray();
+                    images.Add( new immagine { content=base64, name=image.Name, user=nome_utente+"_"+cognome_utente } );
+                }
+            }
+            request richiesta = new();
+            richiesta.dataimages = images;
+            richiesta.token = Variables.Token;
+            var response = await Http.PostAsJsonAsync("api/AddImage", richiesta);
+            resp.msg="Images uploaded";
+            Console.WriteLine("Images uploaded");
+        }else{
+            resp.msg = "No one image uploaded";
+        }
+    }
+
+    public class ApiResponse // class for api users requests
+    {
+        public int? code { get; set; }
+        public string[]? Details { get; set; }
+        public string? msg { get; set; }
+    }
+}
+
+<style>
+
+div.custom_file_upload {
+    height: 20px;
+}
+
+input.file {
+    width: 150px;
+    height: 20px;
+    border: 1px solid #BBB;
+    border-right: 0;
+    color: #888;
+    padding: 5px;
+    border-radius: 5px;
+    outline: none;
+}
+
+div.file_upload {
+    height: 37px;
+    background: #b47aff;
+    background: -moz-linear-gradient(top, #d0adff 0%, #c091ff 44%, rgb(174, 112, 255) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(174, 112, 255)), color-stop(44%,#b47aff), color-stop(100%,#b47aff));
+    background: -webkit-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: -o-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: -ms-linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    background: linear-gradient(top, #d0adff 0%,#c091ff 44%,rgb(174, 112, 255) 100%);
+    /* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b47aff', endColorstr='#b47aff',GradientType=0 ); */
+    cursor: pointer;
+    border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    font-weight: bold;
+    color: #FFF;
+    text-align: center;
+    padding-top: 8px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin: auto;
+    max-width: 200px;
+    
+}
+div.file_upload:before {
+    content: 'SELECT IMAGES';
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+div.file_upload input {
+    position: relative;
+    height: 40px;
+    width: 200px;
+    margin-top: -20px;
+    display: inline;
+    opacity: 0;
+}
+input[type=file]:hover, .file_upload:hover{
+    cursor: pointer;
+}
+</style>
