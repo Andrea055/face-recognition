@@ -38,14 +38,16 @@ Required things:
  - MySQL
  - DotNet 6
 
-**Optional** : edit in ```FaceRecognitionPanel/DBContext/Model.cs``` username and password. 
+**IMPORTANT** : create a user in database for the project and insert the userID and password in ```FaceRecognitionPanel/DBContext/Model.cs```. 
 
-Create the database's scaffholding 
+Create the database's scaffholding [enter in DBContext folder]
 ```bash
+    cd FaceRecognitionPanel/DBContext
     dotnet ef database update
 ```
 
-Run both server and client project
+Run both server and client project [enter in Server folder]
 ```bash
+    cd ../Server
     dotnet run
 ```
