@@ -15,12 +15,12 @@ namespace face_recognition.Server.Controllers
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
         [HttpGet]
-        public JsonResult Get([FromQuery] string token) {
+        public JsonResult Get([FromQuery] string token, [FromQuery] int id_utente) {
             var db = new FaceContext();
             string Output = "";
             int code = 200;
             if(token == Variables.Token){
-                db.Add(new SawUsers{  });
+                db.Add(new SawUsers{ id_user=id_utente });
                 db.SaveChanges(); /* problema erore non trova tabella Classes */
                 errors.TryGetValue(code, out Output);
                 return new JsonResult( new { Code = code, msg = Output/* , utenti = Utenti.Users_db */ } );

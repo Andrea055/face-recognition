@@ -32,6 +32,6 @@ public class file_data{
 
 public class users_images{
     public string? user {get;set;}
-
+    public int? id_user {get;set;}
     public List<file_data>? files {get;set;}
 }

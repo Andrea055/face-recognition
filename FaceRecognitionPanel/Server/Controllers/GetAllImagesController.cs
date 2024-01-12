@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using face_recognition.Shared;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.IO;
+using DBContext;
 
 namespace face_recognition.Server.Controllers
 {
@@ -16,7 +17,8 @@ namespace face_recognition.Server.Controllers
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
         [HttpGet]
-        public List<users_images> GetFiles([FromQuery] string token) {
+        public List<users_images> Get([FromQuery] string token) {
+            var db = new FaceContext();
             string path="utenti/";
             string Output = "";
             int code = 200;
@@ -29,7 +31,13 @@ namespace face_recognition.Server.Controllers
                     // nome utente dalla cartella
                     string[] arr = user.Split("/");
                     string utente = arr[arr.Count()-1];
-                    images.Add( new users_images { user=utente, files=new() });
+                    arr = utente.Split("_");
+                    Console.WriteLine(arr[0]);
+                    Console.WriteLine(arr[1]);
+                    Utenti dati_utente = db.Utenti.FirstOrDefault(u => u.Nome==arr[0] && u.Cognome==arr[1]);
+                    Console.WriteLine("id: ");
+                    Console.WriteLine(dati_utente.Id);
+                    images.Add( new users_images { user=utente, id_user=dati_utente.Id , files=new() });
                     // immagini utente
                     string folderPath = Path.Combine(Directory.GetCurrentDirectory(), user);
                     string[] immagini = Directory.GetFiles(folderPath, "*");

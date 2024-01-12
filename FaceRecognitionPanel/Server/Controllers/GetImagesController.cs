@@ -22,7 +22,7 @@ namespace face_recognition.Server.Controllers
             List<file> files = new();
             if(token == Variables.Token){
                 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "utenti", user);
-                string[] images = Directory.GetFiles(folderPath, "*.jpg");
+                string[] images = Directory.GetFiles(folderPath, "*");
                 foreach(string image in images){
                     string[] arr = image.Split("/");
                     var str = System.IO.File.ReadAllBytes(image);
