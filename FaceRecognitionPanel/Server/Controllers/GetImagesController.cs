@@ -15,18 +15,17 @@ namespace face_recognition.Server.Controllers
         public Dictionary<int, string> errors= MyErrors.Codes_errors;
 
         [HttpGet]
-        public List<file> GetFiles([FromQuery] string token, [FromQuery] string user) {
+        public List<file> Get([FromQuery] string token, [FromQuery] string user) {
             string path="utenti/"+user+"/";
             string Output = "";
             int code = 200;
             List<file> files = new();
             if(token == Variables.Token){
                 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "utenti", user);
-                Console.WriteLine(folderPath);
-                string[] images = Directory.GetFiles(folderPath, "*.jpg");
+                string[] images = Directory.GetFiles(folderPath, "*");
                 foreach(string image in images){
                     string[] arr = image.Split("/");
-                    
+                    var str = System.IO.File.ReadAllBytes(image);
                     files.Add( new file { nome_file=arr[arr.Count()-1] });
                 }
             }else{

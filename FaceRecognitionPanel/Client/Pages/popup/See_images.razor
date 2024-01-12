@@ -20,9 +20,10 @@
     <br><br>
 
     <b>Images uploaded: </b><br>
-
-    @foreach(file f in files){
-        @f.nome_file <br>
+    @foreach(var f in files.Select((img, index) => (img, index))){
+        @f.index
+        <span>) </span> 
+        @f.img.nome_file <br>
     }
 
     <div class='info-utente'> <div class="center"> @resp.msg </div> </div>
@@ -51,6 +52,7 @@
 
     [Parameter]
     public string? nome_utente {get; set;}
+    
     [Parameter]
     public string? cognome_utente {get; set;}
 

@@ -30,9 +30,11 @@
 
     <div>
         @if(immagini.Count!=0){
-            @foreach (var image in immagini)
+            @foreach (var image in immagini.Select((img, index) => (img, index)))
             {
-                @image.Name <br>;
+                @image.index
+                <span>) </span> 
+                @image.img.Name <br>
             }
         }
     </div>
