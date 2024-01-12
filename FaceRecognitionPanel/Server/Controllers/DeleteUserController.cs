@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using face_recognition.Shared;
 using DBContext;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace face_recognition.Server.Controllers
 {
@@ -20,6 +21,12 @@ namespace face_recognition.Server.Controllers
             if(token == Variables.Token){
                 Utenti utente = db.Utenti.FirstOrDefault(u => u.Id == id);
                 string path = "utenti/" + utente.Nome + "_" + utente.Cognome;
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), path);
+                string[] images = Directory.GetFiles(folderPath, "*");
+                foreach(string image in images){
+                    // File.Delete(image);
+                    System.IO.File.Delete(image);
+                }
                 if(Directory.Exists(path)){
                     Directory.Delete(path);
                 }
