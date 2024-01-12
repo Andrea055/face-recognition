@@ -21,7 +21,6 @@ public class requestimages{
     public string? token { get; set; }
     public string? user { get; set; }
 }
-
 public class file{
     public string? nome_file {get;set;}
 }
